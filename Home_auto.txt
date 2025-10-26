@@ -1,0 +1,109 @@
+#include <WiFi.h>
+#include <WebServer.h>
+
+// Define relay pins
+const int relay1 = 4;
+const int relay2 = 5;
+const int relay3 = 16;
+const int relay4 = 17;
+
+// WiFi credentials
+const char* ssid = "IQOOZ7PRO5G";
+const char* password = "12345678";
+
+// Web server
+WebServer server(80);
+
+void setup() {
+  Serial.begin(115200);
+
+  // Initialize relays
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+  pinMode(relay4, OUTPUT);
+
+  // Initialize relays to OFF
+  digitalWrite(relay1, HIGH); // Assuming active low relays
+  digitalWrite(relay2, HIGH);
+  digitalWrite(relay3, HIGH);
+  digitalWrite(relay4, HIGH);
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.print("Connected to the WiFi network");
+  Serial.println(WiFi.localIP());
+
+  // Define web server routes
+  server.on("/", HTTP_GET, []() {
+    String htmlContent = "<!DOCTYPE html><html><head><title>Smart Home Control</title></head><body><h1>Smart Home Control</h1><br>";
+    htmlContent += "<button onclick=\"fetch('/relay1on')\">Relay 1 ON</button><br>";
+    htmlContent += "<button onclick=\"fetch('/relay1off')\">Relay 1 OFF</button><br><br>";
+    htmlContent += "<button onclick=\"fetch('/relay2on')\">Relay 2 ON</button><br>";
+    htmlContent += "<button onclick=\"fetch('/relay2off')\">Relay 2 OFF</button><br><br>";
+    htmlContent += "<button onclick=\"fetch('/relay3on')\">Relay 3 ON</button><br>";
+    htmlContent += "<button onclick=\"fetch('/relay3off')\">Relay 3 OFF</button><br><br>";
+    htmlContent += "<button onclick=\"fetch('/relay4on')\">Relay 4 ON</button><br>";
+    htmlContent += "<button onclick=\"fetch('/relay4off')\">Relay 4 OFF</button></body></html>";
+    server.send(200, "text/html", htmlContent);
+  });
+
+  server.on("/relay1on", HTTP_GET, []() {
+    digitalWrite(relay1, LOW); // Turn relay 1 ON
+    Serial.println("Relay 1 turned ON");
+    server.send(200, "text/plain", "Relay 1 turned ON");
+  });
+
+  server.on("/relay1off", HTTP_GET, []() {
+    digitalWrite(relay1, HIGH); // Turn relay 1 OFF
+    Serial.println("Relay 1 turned OFF");
+    server.send(200, "text/plain", "Relay 1 turned OFF");
+  });
+
+  server.on("/relay2on", HTTP_GET, []() {
+    digitalWrite(relay2, LOW); // Turn relay 2 ON
+    Serial.println("Relay 2 turned ON");
+    server.send(200, "text/plain", "Relay 2 turned ON");
+  });
+
+  server.on("/relay2off", HTTP_GET, []() {
+    digitalWrite(relay2, HIGH); // Turn relay 2 OFF
+    Serial.println("Relay 2 turned OFF");
+    server.send(200, "text/plain", "Relay 2 turned OFF");
+  });
+
+  server.on("/relay3on", HTTP_GET, []() {
+    digitalWrite(relay3, LOW); // Turn relay 3 ON
+    Serial.println("Relay 3 turned ON");
+    server.send(200, "text/plain", "Relay 3 turned ON");
+  });
+
+  server.on("/relay3off", HTTP_GET, []() {
+    digitalWrite(relay3, HIGH); // Turn relay 3 OFF
+    Serial.println("Relay 3 turned OFF");
+    server.send(200, "text/plain", "Relay 3 turned OFF");
+  });
+
+  server.on("/relay4on", HTTP_GET, []() {
+    digitalWrite(relay4, LOW); // Turn relay 4 ON
+    Serial.println("Relay 4 turned ON");
+    server.send(200, "text/plain", "Relay 4 turned ON");
+  });
+
+  server.on("/relay4off", HTTP_GET, []() {
+    digitalWrite(relay4, HIGH); // Turn relay 4 OFF
+    Serial.println("Relay 4 turned OFF");
+    server.send(200, "text/plain", "Relay 4 turned OFF");
+  });
+
+  server.begin();
+  Serial.println("Web server started");
+}
+
+void loop() {
+  server.handleClient();
+}
